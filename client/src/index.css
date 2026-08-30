@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-canvas text-ink font-sans;
+  font-feature-settings: "ss01" 1;
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid theme('colors.marigold.500');
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: theme('colors.marigold.200');
+  color: theme('colors.ink.DEFAULT');
+}
+
+/* Signature: threaded syllabus path — connecting rule used across
+   progress lists (course path, sidebar step, lesson list) */
+.path-line {
+  position: relative;
+}
+.path-line::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 28px;
+  bottom: -4px;
+  width: 1.5px;
+  background: repeating-linear-gradient(
+    to bottom,
+    theme('colors.indigo.200') 0,
+    theme('colors.indigo.200') 4px,
+    transparent 4px,
+    transparent 9px
+  );
+}
+.path-line:last-child::before {
+  display: none;
+}
+
+.node-done {
+  @apply bg-moss-500 border-moss-500;
+}
+.node-current {
+  @apply bg-marigold-400 border-marigold-400;
+  box-shadow: 0 0 0 4px theme('colors.marigold.100');
+}
+.node-todo {
+  @apply bg-canvas-raised border-ink/20;
+}
+
+/* Scrollbar, subtle */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: theme('colors.ink.faint' / 30%); border-radius: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
