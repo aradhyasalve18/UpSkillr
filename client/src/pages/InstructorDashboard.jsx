@@ -20,28 +20,28 @@ export default function InstructorDashboard() {
     <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-600">Instructor dashboard</p>
+          <p className="font-mono text-[11px] uppercase tracking-wide text-brand-500">Instructor dashboard</p>
           <h1 className="mt-1 font-display text-3xl font-medium text-ink">Hi {user?.name?.split(" ")[0]}, here's your teaching activity</h1>
         </div>
         <Link
           to="/instructor/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+          className="inline-flex items-center gap-2 rounded bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-900"
         >
           <PlusCircle size={16} /> New course
         </Link>
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Stat icon={BookOpen} label="Published courses" value={demoCourses + published.length} tone="indigo" />
-        <Stat icon={Users} label="Total learners" value={(12925 + totalLearners).toLocaleString()} tone="marigold" />
-        <Stat icon={Star} label="Average rating" value="4.75" tone="moss" />
+        <Stat label="Published courses" value={demoCourses + published.length} />
+        <Stat label="Total learners" value={(12925 + totalLearners).toLocaleString()} />
+        <Stat label="Average rating" value="4.75" />
       </div>
 
       <section className="mt-10">
         <h2 className="mb-4 font-display text-xl font-medium text-ink">Your courses</h2>
-        <div className="overflow-hidden rounded-xl border border-ink/10 bg-canvas-raised">
+        <div className="overflow-hidden rounded-md border border-border-subtle bg-surface">
           <table className="w-full text-left text-sm">
-            <thead className="bg-canvas-sunken text-xs uppercase tracking-wide text-ink-faint">
+            <thead className="bg-canvas text-xs uppercase tracking-wide text-ink-soft">
               <tr>
                 <th className="px-5 py-3 font-medium">Course</th>
                 <th className="px-5 py-3 font-medium">Status</th>
@@ -50,7 +50,7 @@ export default function InstructorDashboard() {
                 <th className="px-5 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-ink/10">
+            <tbody className="divide-y divide-border-subtle">
               {demoInstructor.courseIds.map((cid) => (
                 <DemoRow key={cid} courseId={cid} />
               ))}
@@ -58,7 +58,7 @@ export default function InstructorDashboard() {
                 <tr key={c.id}>
                   <td className="px-5 py-4">
                     <p className="font-medium text-ink">{c.title}</p>
-                    <p className="text-xs text-ink-faint">{c.category} · {c.level}</p>
+                    <p className="text-xs text-ink-soft">{c.category} · {c.level}</p>
                   </td>
                   <td className="px-5 py-4">
                     <StatusBadge status={c.status} />
@@ -66,7 +66,7 @@ export default function InstructorDashboard() {
                   <td className="px-5 py-4 font-mono text-ink-soft">{c.learners || 0}</td>
                   <td className="px-5 py-4 font-mono text-ink-soft">{c.rating ? c.rating.toFixed(1) : "—"}</td>
                   <td className="px-5 py-4 text-right">
-                    <span className="inline-flex items-center gap-1 text-xs text-ink-faint">
+                    <span className="inline-flex items-center gap-1 text-xs text-ink-soft">
                       <Pencil size={13} /> Edit
                     </span>
                   </td>
@@ -76,7 +76,7 @@ export default function InstructorDashboard() {
           </table>
         </div>
         {myCourses.length === 0 && (
-          <p className="mt-3 text-xs text-ink-faint">
+          <p className="mt-3 text-xs text-ink-soft">
             Rows above with real edit access are courses you create. Sample rows show how published courses with analytics will appear.
           </p>
         )}
@@ -93,13 +93,13 @@ function DemoRow({ courseId }) {
     <tr>
       <td className="px-5 py-4">
         <p className="font-medium text-ink">{data.title}</p>
-        <p className="text-xs text-ink-faint">{data.category} · {data.level}</p>
+        <p className="text-xs text-ink-soft">{data.category} · {data.level}</p>
       </td>
       <td className="px-5 py-4"><StatusBadge status="published" /></td>
       <td className="px-5 py-4 font-mono text-ink-soft">{data.learners.toLocaleString()}</td>
       <td className="px-5 py-4 font-mono text-ink-soft">{data.rating}</td>
       <td className="px-5 py-4 text-right">
-        <Link to={`/courses/${data.slug}`} className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700">
+        <Link to={`/courses/${data.slug}`} className="inline-flex items-center gap-1 text-xs font-medium text-brand-500 hover:text-brand-900">
           <Eye size={13} /> View
         </Link>
       </td>
@@ -115,8 +115,8 @@ const SAMPLE = {
 
 function StatusBadge({ status }) {
   const map = {
-    published: "bg-moss-50 text-moss-600",
-    draft: "bg-marigold-50 text-marigold-600",
+    published: "border border-success text-success",
+    draft: "border border-border-subtle bg-canvas text-ink-soft",
   };
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${map[status] || map.draft}`}>
@@ -126,19 +126,11 @@ function StatusBadge({ status }) {
   );
 }
 
-function Stat({ icon: Icon, label, value, tone }) {
-  const toneClasses = {
-    indigo: "bg-indigo-50 text-indigo-600",
-    marigold: "bg-marigold-50 text-marigold-600",
-    moss: "bg-moss-50 text-moss-600",
-  }[tone];
+function Stat({ label, value }) {
   return (
-    <div className="rounded-xl border border-ink/10 bg-canvas-raised p-5">
-      <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${toneClasses}`}>
-        <Icon size={17} />
-      </span>
-      <p className="mt-3 font-display text-2xl font-semibold text-ink">{value}</p>
-      <p className="text-xs text-ink-faint">{label}</p>
+    <div className="flex flex-col justify-between rounded-md border border-border-subtle bg-surface p-5 h-full">
+      <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
+      <p className="mt-3 font-display text-4xl font-medium text-ink">{value}</p>
     </div>
   );
 }

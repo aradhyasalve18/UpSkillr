@@ -14,20 +14,20 @@ export default function LearnerDashboard() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
-      <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-600">Learner dashboard</p>
+      <p className="font-mono text-[11px] uppercase tracking-wide text-brand-500">Learner dashboard</p>
       <h1 className="mt-1 font-display text-3xl font-medium text-ink">Welcome back, {user?.name?.split(" ")[0]}</h1>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <StatCard icon={BookOpen} label="Courses enrolled" value={enrolled.length} tone="indigo" />
-        <StatCard icon={Flame} label="Lessons completed" value={totalLessonsDone} tone="marigold" />
-        <StatCard icon={Trophy} label="Courses finished" value={completed.length} tone="moss" />
+        <StatCard label="Courses enrolled" value={enrolled.length} />
+        <StatCard label="Lessons completed" value={totalLessonsDone} />
+        <StatCard label="Courses finished" value={completed.length} />
       </div>
 
       <section className="mt-10">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-xl font-medium text-ink">Continue learning</h2>
           {inProgress.length > 0 && (
-            <Link to="/courses" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 inline-flex items-center gap-1">
+            <Link to="/courses" className="text-sm font-medium text-brand-500 hover:text-brand-900 inline-flex items-center gap-1">
               Find more courses <ArrowRight size={14} />
             </Link>
           )}
@@ -37,7 +37,7 @@ export default function LearnerDashboard() {
             icon={BookOpen}
             title="Nothing in progress yet"
             description="Enrol in a course from the catalog and it will show up here, with your progress tracked lesson by lesson."
-            action={<Link to="/courses" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Browse courses</Link>}
+            action={<Link to="/courses" className="rounded bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-900">Browse courses</Link>}
           />
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -62,19 +62,11 @@ export default function LearnerDashboard() {
   );
 }
 
-function StatCard({ icon: Icon, label, value, tone }) {
-  const toneClasses = {
-    indigo: "bg-indigo-50 text-indigo-600",
-    marigold: "bg-marigold-50 text-marigold-600",
-    moss: "bg-moss-50 text-moss-600",
-  }[tone];
+function StatCard({ label, value }) {
   return (
-    <div className="rounded-xl border border-ink/10 bg-canvas-raised p-5">
-      <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${toneClasses}`}>
-        <Icon size={17} />
-      </span>
-      <p className="mt-3 font-display text-2xl font-semibold text-ink">{value}</p>
-      <p className="text-xs text-ink-faint">{label}</p>
+    <div className="flex flex-col justify-between rounded-md border border-border-subtle bg-surface p-5 h-full">
+      <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
+      <p className="mt-3 font-display text-4xl font-medium text-ink">{value}</p>
     </div>
   );
 }

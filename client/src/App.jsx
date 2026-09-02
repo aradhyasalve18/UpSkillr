@@ -55,7 +55,14 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/admin" element={<AdminDashboard />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute role="admin">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/profile"
                 element={

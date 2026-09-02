@@ -17,7 +17,7 @@ export default function RatingModal({ onSubmit, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-ink/10 bg-canvas-raised p-5">
+    <form onSubmit={handleSubmit} className="rounded-md border border-border-subtle bg-surface p-5">
       <p className="mb-2 text-sm font-medium text-ink">Your rating</p>
       <div className="mb-4 flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((n) => (
@@ -34,14 +34,14 @@ export default function RatingModal({ onSubmit, onCancel }) {
         required
         rows={3}
         placeholder="What stood out about this course?"
-        className="w-full rounded-lg border border-ink/15 bg-canvas px-3.5 py-2.5 text-sm focus:border-indigo-400"
+        className="w-full rounded border border-border-subtle bg-canvas px-3.5 py-2.5 text-sm focus:border-brand-500"
       />
       <div className="mt-3 flex gap-2">
-        <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+        <button type="submit" className="rounded bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-900">
           Submit feedback
         </button>
         {onCancel && (
-          <button type="button" onClick={onCancel} className="rounded-lg px-4 py-2 text-sm font-medium text-ink-faint hover:text-ink">
+          <button type="button" onClick={onCancel} className="rounded px-4 py-2 text-sm font-medium text-ink-soft hover:text-ink">
             Cancel
           </button>
         )}

@@ -9,15 +9,15 @@ export default function RatingStars({ value = 0, size = 14, showValue = true, co
           <Star
             key={i}
             size={size}
-            className={i < full ? "fill-marigold-400 text-marigold-400" : "fill-transparent text-ink/20"}
+            className={i < full ? "fill-brand-500 text-brand-500" : "fill-transparent opacity-30"}
             strokeWidth={1.5}
           />
         ))}
       </span>
       {showValue && value > 0 && (
-        <span className="font-mono text-xs text-ink-soft">
+        <span className="font-mono text-xs opacity-90">
           {value.toFixed(1)}
-          {count != null && <span className="text-ink-faint"> ({count.toLocaleString()})</span>}
+          {count != null && <span className="opacity-60"> ({count.toLocaleString()})</span>}
         </span>
       )}
     </span>

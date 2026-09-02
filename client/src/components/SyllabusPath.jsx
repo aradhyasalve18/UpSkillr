@@ -25,9 +25,9 @@ export default function SyllabusPath({ lessons, completedLessonIds = [], current
               {done ? (
                 <Check size={13} className="text-white" strokeWidth={3} />
               ) : lesson.type === "assessment" ? (
-                <FileCheck2 size={12} className={isCurrent ? "text-white" : "text-ink-faint"} />
+                <FileCheck2 size={12} className={isCurrent ? "text-white" : "text-ink-soft"} />
               ) : (
-                <PlayCircle size={12} className={isCurrent ? "text-white" : "text-ink-faint"} />
+                <PlayCircle size={12} className={isCurrent ? "text-white" : "text-ink-soft"} />
               )}
             </span>
 
@@ -35,21 +35,21 @@ export default function SyllabusPath({ lessons, completedLessonIds = [], current
               <button
                 type="button"
                 onClick={() => onSelect?.(lesson)}
-                className="group flex w-full items-start justify-between gap-3 rounded-lg -mt-0.5 px-2 py-1 text-left transition hover:bg-indigo-50"
+                className="group flex w-full items-start justify-between gap-3 rounded -mt-0.5 px-2 py-1 text-left transition hover:bg-canvas"
               >
                 <span>
-                  <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-faint">
+                  <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-soft">
                     {lesson.type === "assessment" ? "Assessment" : `Lesson ${lesson.order}`}
                   </span>
-                  <span className={`block text-sm font-medium ${isCurrent ? "text-indigo-600" : "text-ink"}`}>
+                  <span className={`block text-sm font-medium ${isCurrent ? "text-brand-500" : "text-ink"}`}>
                     {lesson.title}
                   </span>
                 </span>
-                <span className="mt-3.5 shrink-0 font-mono text-xs text-ink-faint">{lesson.duration}</span>
+                <span className="mt-3.5 shrink-0 font-mono text-xs text-ink-soft">{lesson.duration}</span>
               </button>
             ) : (
               <div className="-mt-0.5 px-2 py-1">
-                <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-faint">
+                <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-soft">
                   {lesson.type === "assessment" ? "Assessment" : `Lesson ${lesson.order}`}
                 </span>
                 <span className="block text-sm font-medium text-ink">{lesson.title}</span>

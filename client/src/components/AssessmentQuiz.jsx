@@ -8,8 +8,8 @@ import { FileCheck2 } from "lucide-react";
  */
 export default function AssessmentQuiz({ lesson }) {
   return (
-    <div className="flex aspect-video flex-col items-center justify-center rounded-xl border border-ink/10 bg-ink text-white">
-      <FileCheck2 size={36} className="mb-3 text-marigold-400" />
+    <div className="flex aspect-video flex-col items-center justify-center rounded-md border border-border-subtle bg-ink text-white">
+      <FileCheck2 size={36} className="mb-3 text-brand-500" />
       <p className="text-sm text-white/80">{lesson?.title || "Assessment"}</p>
       <p className="mt-1 text-xs text-white/50">Quiz questions render here once the assessment schema is wired up.</p>
     </div>

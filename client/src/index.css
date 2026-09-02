@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -18,19 +18,18 @@ html, body, #root {
 
 body {
   @apply bg-canvas text-ink font-sans;
-  font-feature-settings: "ss01" 1;
 }
 
 /* Visible keyboard focus everywhere */
 :focus-visible {
-  outline: 2px solid theme('colors.marigold.500');
+  outline: 2px solid theme('colors.brand.500');
   outline-offset: 2px;
   border-radius: 2px;
 }
 
 ::selection {
-  background: theme('colors.marigold.200');
-  color: theme('colors.ink.DEFAULT');
+  background: theme('colors.brand.900');
+  color: theme('colors.surface');
 }
 
 /* Signature: threaded syllabus path — connecting rule used across
@@ -47,8 +46,8 @@ body {
   width: 1.5px;
   background: repeating-linear-gradient(
     to bottom,
-    theme('colors.indigo.200') 0,
-    theme('colors.indigo.200') 4px,
+    theme('colors.border.subtle') 0,
+    theme('colors.border.subtle') 4px,
     transparent 4px,
     transparent 9px
   );
@@ -58,20 +57,20 @@ body {
 }
 
 .node-done {
-  @apply bg-moss-500 border-moss-500;
+  @apply bg-[#26734D] border-[#26734D];
 }
 .node-current {
-  @apply bg-marigold-400 border-marigold-400;
-  box-shadow: 0 0 0 4px theme('colors.marigold.100');
+  @apply bg-brand-500 border-brand-500;
+  box-shadow: 0 0 0 4px theme('colors.brand.900' / 10%);
 }
 .node-todo {
-  @apply bg-canvas-raised border-ink/20;
+  @apply bg-surface border-border-subtle;
 }
 
 /* Scrollbar, subtle */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: theme('colors.ink.faint' / 30%); border-radius: 8px; }
+::-webkit-scrollbar-thumb { background: theme('colors.ink.soft' / 30%); border-radius: 8px; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

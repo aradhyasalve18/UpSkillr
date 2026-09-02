@@ -21,7 +21,7 @@ export default function Admin() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
-      <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-600">Admin console</p>
+      <p className="font-mono text-[11px] uppercase tracking-wide text-brand-500">Admin console</p>
       <h1 className="mt-1 font-display text-3xl font-medium text-ink">Platform overview</h1>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -36,18 +36,18 @@ export default function Admin() {
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="font-display text-xl font-medium text-ink">Course review</h2>
             <div className="relative">
-              <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+              <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search courses"
-                className="rounded-lg border border-ink/15 bg-canvas-raised py-2 pl-8 pr-3 text-sm focus:border-indigo-400"
+                className="rounded border border-border-subtle bg-surface py-2 pl-8 pr-3 text-sm focus:border-brand-500"
               />
             </div>
           </div>
-          <div className="overflow-hidden rounded-xl border border-ink/10 bg-canvas-raised">
+          <div className="overflow-hidden rounded-md border border-border-subtle bg-surface">
             <table className="w-full text-left text-sm">
-              <thead className="bg-canvas-sunken text-xs uppercase tracking-wide text-ink-faint">
+              <thead className="bg-canvas text-xs uppercase tracking-wide text-ink-soft">
                 <tr>
                   <th className="px-4 py-3 font-medium">Course</th>
                   <th className="px-4 py-3 font-medium">Category</th>
@@ -55,14 +55,14 @@ export default function Admin() {
                   <th className="px-4 py-3 font-medium">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ink/10">
+              <tbody className="divide-y divide-border-subtle">
                 {filtered.map((c) => (
                   <tr key={c.id}>
                     <td className="px-4 py-3.5 font-medium text-ink">{c.title}</td>
-                    <td className="px-4 py-3.5 text-ink-faint">{c.category}</td>
+                    <td className="px-4 py-3.5 text-ink-soft">{c.category}</td>
                     <td className="px-4 py-3.5"><RatingStars value={c.rating} showValue={false} size={12} /></td>
                     <td className="px-4 py-3.5">
-                      <span className="inline-flex items-center rounded-full bg-moss-50 px-2.5 py-1 text-xs font-medium text-moss-600">Live</span>
+                      <span className="inline-flex items-center rounded border border-success px-2.5 py-1 text-xs font-medium text-success">Live</span>
                     </td>
                   </tr>
                 ))}
@@ -73,17 +73,17 @@ export default function Admin() {
 
         <section>
           <h2 className="mb-4 font-display text-xl font-medium text-ink">Recent activity</h2>
-          <div className="rounded-xl border border-ink/10 bg-canvas-raised p-5">
+          <div className="rounded-md border border-border-subtle bg-surface p-5">
             <ul className="space-y-4">
               {ACTIVITY.map((a) => (
                 <li key={a.id} className="flex items-start gap-3 text-sm">
-                  <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                  <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-canvas text-brand-500">
                     <Activity size={12} />
                   </span>
                   <p className="text-ink-soft">
                     <span className="font-medium text-ink">{a.actor}</span> {a.action}{" "}
                     <span className="font-medium text-ink">{a.target}</span>
-                    <span className="ml-1.5 font-mono text-xs text-ink-faint">{a.time}</span>
+                    <span className="ml-1.5 font-mono text-xs text-ink-soft">{a.time}</span>
                   </p>
                 </li>
               ))}
@@ -97,12 +97,12 @@ export default function Admin() {
 
 function Stat({ icon: Icon, label, value }) {
   return (
-    <div className="rounded-xl border border-ink/10 bg-canvas-raised p-5">
-      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+    <div className="rounded-md border border-border-subtle bg-surface p-5">
+      <span className="flex h-9 w-9 items-center justify-center rounded bg-canvas text-brand-500">
         <Icon size={17} />
       </span>
       <p className="mt-3 font-display text-2xl font-semibold text-ink">{value}</p>
-      <p className="text-xs text-ink-faint">{label}</p>
+      <p className="text-xs text-ink-soft">{label}</p>
     </div>
   );
 }
