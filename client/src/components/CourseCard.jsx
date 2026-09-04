@@ -1,9 +1,6 @@
 import { Link } from "react-router-dom";
 import { Clock, Users } from "lucide-react";
-import { findInstructor } from "../data/mockData";
-import RatingStars from "./RatingStars";
-import ProgressBar from "./ProgressBar";
-
+import { findInstructor } from "../context/AuthContext";
 const initials = (name) =>
   name
     .split(" ")

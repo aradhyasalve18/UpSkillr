@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Users, BookOpen, Activity, ShieldCheck, TrendingUp, Search } from "lucide-react";
-import { COURSES, INSTRUCTORS } from "../data/mockData";
-import RatingStars from "../components/RatingStars";
+import { COURSES, INSTRUCTORS } from "../context/AuthContext";
+import { Star } from "lucide-react";
+
 
 const ACTIVITY = [
   { id: 1, actor: "Meera Kulkarni", action: "published", target: "React for Production", time: "2h ago" },
@@ -104,5 +105,31 @@ function Stat({ icon: Icon, label, value }) {
       <p className="mt-3 font-display text-2xl font-semibold text-ink">{value}</p>
       <p className="text-xs text-ink-soft">{label}</p>
     </div>
+  );
+}
+
+
+// --- INJECTED HELPER ---
+function RatingStars({ value = 0, size = 14, showValue = true, count }) {
+  const full = Math.round(value);
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className="inline-flex items-center">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star
+            key={i}
+            size={size}
+            className={i < full ? "fill-brand-500 text-brand-500" : "fill-transparent opacity-30"}
+            strokeWidth={1.5}
+          />
+        ))}
+      </span>
+      {showValue && value > 0 && (
+        <span className="font-mono text-xs opacity-90">
+          {value.toFixed(1)}
+          {count != null && <span className="opacity-60"> ({count.toLocaleString()})</span>}
+        </span>
+      )}
+    </span>
   );
 }

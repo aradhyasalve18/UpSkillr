@@ -1,5 +1,6 @@
 import { FileCheck2 } from "lucide-react";
 
+
 /**
  * Renders an assessment-type lesson inside the LearningPlayer (FR-04).
  * Owner: Developer 3 (Enrollment & Progress). This is a structural placeholder —

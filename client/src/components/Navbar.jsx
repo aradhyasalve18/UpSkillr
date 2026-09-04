@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, X, GraduationCap, ChevronDown } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
+
 const initials = (name) =>
   name.split(" ").map((p) => p[0]).slice(0, 2).join("");
 

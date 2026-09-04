@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { PlusCircle, Users, Star, BookOpen, Pencil, Eye, FileClock } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { INSTRUCTORS } from "../data/mockData";
-import EmptyState from "../components/EmptyState";
+import { INSTRUCTORS } from "../context/AuthContext";
+
 
 export default function InstructorDashboard() {
   const { user, myCourses } = useAuth();
@@ -131,6 +131,23 @@ function Stat({ label, value }) {
     <div className="flex flex-col justify-between rounded-md border border-border-subtle bg-surface p-5 h-full">
       <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
       <p className="mt-3 font-display text-4xl font-medium text-ink">{value}</p>
+    </div>
+  );
+}
+
+
+// --- INJECTED EmptyState ---
+function EmptyState({ icon: Icon, title, description, action }) {
+  return (
+    <div className="flex flex-col items-center rounded-md border border-dashed border-border-subtle bg-surface px-6 py-14 text-center">
+      {Icon && (
+        <span className="mb-4 flex h-12 w-12 items-center justify-center rounded bg-canvas text-brand-500">
+          <Icon size={22} />
+        </span>
+      )}
+      <h3 className="font-display text-lg font-medium text-ink">{title}</h3>
+      {description && <p className="mt-1.5 max-w-sm text-sm text-ink-soft">{description}</p>}
+      {action && <div className="mt-5">{action}</div>}
     </div>
   );
 }

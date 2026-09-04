@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ShieldAlert } from "lucide-react";
 
+
 export default function ProtectedRoute({ role, children }) {
   const { user } = useAuth();
   const location = useLocation();

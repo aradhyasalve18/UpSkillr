@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, CheckCircle2, Circle, PlayCircle, PanelLeftClose, PanelLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, PlayCircle, PanelLeftClose, PanelLeft, Check, FileCheck2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import SyllabusPath from "../components/SyllabusPath";
-import ProgressBar from "../components/ProgressBar";
 import AssessmentQuiz from "../components/AssessmentQuiz";
+
 
 export default function Learn() {
   const { slug } = useParams();
@@ -167,5 +166,95 @@ export default function Learn() {
         </div>
       </div>
     </div>
+  );
+}
+
+
+// --- INJECTED ProgressBar ---
+function ProgressBar({ percent = 0, tone = "brand", label }) {
+  const fillClass = tone === "success" ? "bg-success" : "bg-brand-500";
+  return (
+    <div className="w-full">
+      {label && (
+        <div className="mb-1.5 flex items-center justify-between">
+          <span className="text-xs text-ink-soft">{label}</span>
+          <span className="font-mono text-xs text-ink-soft">{percent}%</span>
+        </div>
+      )}
+      <div
+        className="h-1.5 w-full overflow-hidden rounded-sm bg-border-subtle"
+        role="progressbar"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div className={`h-full rounded-sm ${fillClass} transition-all duration-500`} style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
+
+// --- INJECTED SyllabusPath ---
+
+/**
+ * Renders an ordered list of lessons as a threaded "syllabus path":
+ * a vertical dashed line connecting node markers per lesson. This is the
+ * platform's signature structural device — legitimate here because course
+ * content genuinely is sequential (lessons run in a fixed order).
+ */
+function SyllabusPath({ lessons, completedLessonIds = [], currentLessonId, onSelect, interactive = false }) {
+  const firstIncompleteId = lessons.find((l) => !completedLessonIds.includes(l.id))?.id;
+
+  return (
+    <ol>
+      {lessons.map((lesson) => {
+        const done = completedLessonIds.includes(lesson.id);
+        const isCurrent = currentLessonId ? currentLessonId === lesson.id : lesson.id === firstIncompleteId;
+        const state = done ? "done" : isCurrent ? "current" : "todo";
+
+        return (
+          <li key={lesson.id} className="path-line pb-6 pl-9 relative last:pb-0">
+            <span
+              className={`absolute left-0 top-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 node-${state}`}
+              aria-hidden="true"
+            >
+              {done ? (
+                <Check size={13} className="text-white" strokeWidth={3} />
+              ) : lesson.type === "assessment" ? (
+                <FileCheck2 size={12} className={isCurrent ? "text-white" : "text-ink-soft"} />
+              ) : (
+                <PlayCircle size={12} className={isCurrent ? "text-white" : "text-ink-soft"} />
+              )}
+            </span>
+
+            {interactive ? (
+              <button
+                type="button"
+                onClick={() => onSelect?.(lesson)}
+                className="group flex w-full items-start justify-between gap-3 rounded -mt-0.5 px-2 py-1 text-left transition hover:bg-canvas"
+              >
+                <span>
+                  <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-soft">
+                    {lesson.type === "assessment" ? "Assessment" : `Lesson ${lesson.order}`}
+                  </span>
+                  <span className={`block text-sm font-medium ${isCurrent ? "text-brand-500" : "text-ink"}`}>
+                    {lesson.title}
+                  </span>
+                </span>
+                <span className="mt-3.5 shrink-0 font-mono text-xs text-ink-soft">{lesson.duration}</span>
+              </button>
+            ) : (
+              <div className="-mt-0.5 px-2 py-1">
+                <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-soft">
+                  {lesson.type === "assessment" ? "Assessment" : `Lesson ${lesson.order}`}
+                </span>
+                <span className="block text-sm font-medium text-ink">{lesson.title}</span>
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }

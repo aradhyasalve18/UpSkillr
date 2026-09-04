@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { CATEGORIES } from "../data/mockData";
+import { CATEGORIES } from "../context/AuthContext";
 import { useAuth } from "../context/AuthContext";
 import CourseCard from "../components/CourseCard";
-import EmptyState from "../components/EmptyState";
+
 
 const LEVELS = ["Beginner", "Intermediate", "Advanced"];
 const SORTS = [
@@ -198,5 +198,22 @@ function Chip({ label, onRemove }) {
         <X size={12} />
       </button>
     </span>
+  );
+}
+
+
+// --- INJECTED EmptyState ---
+function EmptyState({ icon: Icon, title, description, action }) {
+  return (
+    <div className="flex flex-col items-center rounded-md border border-dashed border-border-subtle bg-surface px-6 py-14 text-center">
+      {Icon && (
+        <span className="mb-4 flex h-12 w-12 items-center justify-center rounded bg-canvas text-brand-500">
+          <Icon size={22} />
+        </span>
+      )}
+      <h3 className="font-display text-lg font-medium text-ink">{title}</h3>
+      {description && <p className="mt-1.5 max-w-sm text-sm text-ink-soft">{description}</p>}
+      {action && <div className="mt-5">{action}</div>}
+    </div>
   );
 }

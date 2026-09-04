@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Trash2, GripVertical, FileText, Video, FileCheck2, Check, ArrowRight, ArrowLeft } from "lucide-react";
-import { CATEGORIES } from "../data/mockData";
+import { CATEGORIES } from "../context/AuthContext";
 import { useAuth } from "../context/AuthContext";
+
 
 const STEPS = ["Details", "Curriculum", "Resources", "Review & publish"];
 const HERO_COLORS = ["#2B3A67", "#4B6B4E", "#B2661C", "#8493C3", "#A1423A", "#5D8259"];

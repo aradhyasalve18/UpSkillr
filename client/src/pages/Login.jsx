@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { GraduationCap, BookOpen, PenSquare } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
+
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();

@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check, PlayCircle, FileCheck2, Code2, Cloud, LineChart, PenTool, Briefcase, LayoutGrid } from "lucide-react";
-import { COURSES, CATEGORIES, findInstructor } from "../data/mockData";
+import { COURSES, CATEGORIES, findInstructor } from "../context/AuthContext";
 import CourseCard from "../components/CourseCard";
 import { useAuth } from "../context/AuthContext";
+
 
 const categoryIcons = {
   "Web Development": Code2,

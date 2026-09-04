@@ -4,6 +4,7 @@ import { GraduationCap, Check } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { RoleToggle, Field } from "./Login";
 
+
 export default function Register() {
   const { login } = useAuth();
   const navigate = useNavigate();
