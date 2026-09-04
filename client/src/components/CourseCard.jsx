@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Clock, Users } from "lucide-react";
+import { Clock, Users, Star } from "lucide-react";
 import { findInstructor } from "../context/AuthContext";
 const initials = (name) =>
   name
@@ -56,5 +56,41 @@ export default function CourseCard({ course, progress }) {
         )}
       </div>
     </Link>
+  );
+}
+
+function RatingStars({ value = 0, size = 14, showValue = true, count }) {
+  const full = Math.round(value);
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className="inline-flex items-center">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star key={i} size={size} className={i < full ? "fill-brand-500 text-brand-500" : "fill-transparent opacity-30"} strokeWidth={1.5} />
+        ))}
+      </span>
+      {showValue && value > 0 && (
+        <span className="font-mono text-xs opacity-90">
+          {value.toFixed(1)}
+          {count != null && <span className="opacity-60"> ({count.toLocaleString()})</span>}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function ProgressBar({ percent = 0, tone = "brand", label }) {
+  const fillClass = tone === "success" ? "bg-[#26734D]" : "bg-brand-500";
+  return (
+    <div className="w-full">
+      {label && (
+        <div className="mb-1.5 flex items-center justify-between">
+          <span className="text-xs text-ink-soft">{label}</span>
+          <span className="font-mono text-xs text-ink-soft">{percent}%</span>
+        </div>
+      )}
+      <div className="h-1.5 w-full overflow-hidden rounded-sm bg-border-subtle" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
+        <div className={`h-full rounded-sm ${fillClass} transition-all duration-500`} style={{ width: `${percent}%` }} />
+      </div>
+    </div>
   );
 }
