@@ -26,16 +26,16 @@ export default function Navbar() {
     if (user.role === "learner") {
       return [
         { to: "/courses", label: "Discover" },
-        { to: "/dashboard", label: "My Learning" },
-        { to: "/dashboard", label: "Progress" }
+        { to: "/dashboard?tab=learning", label: "My Learning" },
+        { to: "/dashboard?tab=progress", label: "Progress" }
       ];
     }
     if (user.role === "instructor") {
       return [
         { to: "/instructor", label: "Dashboard" },
-        { to: "/instructor", label: "My Courses" },
+        { to: "/instructor?tab=courses", label: "My Courses" },
         { to: "/instructor/new", label: "Create Course" },
-        { to: "/instructor", label: "Students" }
+        { to: "/instructor?tab=students", label: "Students" }
       ];
     }
     if (user.role === "admin") {

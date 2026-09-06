@@ -39,7 +39,13 @@ export default function Login() {
         <h1 className="font-display text-2xl font-medium text-ink">Welcome back</h1>
         <p className="mt-1 text-sm text-ink-soft">Log in to pick up your courses where you left off.</p>
 
-        <RoleToggle role={role} setRole={setRole} />
+        {location.state?.enforceRole ? (
+          <div className="mt-5 rounded bg-canvas p-3 text-center text-sm font-medium text-brand-500">
+            Signing in as Learner
+          </div>
+        ) : (
+          <RoleToggle role={role} setRole={setRole} />
+        )}
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           <Field label="Full name" value={name} onChange={setName} placeholder="Kira Sharma" type="text" />
@@ -58,7 +64,7 @@ export default function Login() {
 
         <p className="mt-5 text-center text-sm text-ink-soft">
           No account yet?{" "}
-          <Link to="/register" className="font-medium text-brand-500 hover:text-brand-900">
+          <Link to="/register" state={location.state} className="font-medium text-brand-500 hover:text-brand-900">
             Create one
           </Link>
         </p>

@@ -35,7 +35,7 @@ export default function CourseDetail() {
 
   const handleEnrol = () => {
     if (!user) {
-      navigate("/login", { state: { from: `/courses/${course.slug}` } });
+      navigate("/login", { state: { from: `/courses/${course.slug}`, enforceRole: "learner" } });
       return;
     }
     enrol(course.id);
@@ -189,7 +189,7 @@ export default function CourseDetail() {
                   onClick={handleEnrol}
                   className="mt-5 block w-full rounded bg-brand-500 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-900"
                 >
-                  Enrol in one click
+                  Enrol Now
                 </button>
               </>
             )}

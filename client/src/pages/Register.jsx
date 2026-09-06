@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { GraduationCap, Check } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { RoleToggle, Field } from "./Login";
@@ -8,6 +8,7 @@ import { RoleToggle, Field } from "./Login";
 export default function Register() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [role, setRole] = useState("learner");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,7 +26,8 @@ export default function Register() {
       return;
     }
     login(name, role);
-    navigate(role === "instructor" ? "/instructor" : role === "admin" ? "/admin" : "/dashboard", { replace: true });
+    const redirectTo = location.state?.from || (role === "instructor" ? "/instructor" : role === "admin" ? "/admin" : "/dashboard");
+    navigate(redirectTo, { replace: true });
   };
 
   return (
@@ -61,7 +63,13 @@ export default function Register() {
           <h1 className="font-display text-2xl font-medium text-ink">Create your account</h1>
           <p className="mt-1 text-sm text-ink-soft">Choose how you'll use UpSkillr — you can teach and learn with separate accounts.</p>
 
-          <RoleToggle role={role} setRole={setRole} />
+          {location.state?.enforceRole ? (
+            <div className="mt-5 rounded bg-canvas p-3 text-center text-sm font-medium text-brand-500">
+              Registering as Learner
+            </div>
+          ) : (
+            <RoleToggle role={role} setRole={setRole} />
+          )}
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <Field label="Full name" value={name} onChange={setName} placeholder="Kira Sharma" required />
@@ -80,7 +88,7 @@ export default function Register() {
 
           <p className="mt-5 text-center text-sm text-ink-soft">
             Already have an account?{" "}
-            <Link to="/login" className="font-medium text-brand-500 hover:text-brand-900">
+            <Link to="/login" state={location.state} className="font-medium text-brand-500 hover:text-brand-900">
               Log in
             </Link>
           </p>
