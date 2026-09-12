@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Clock, Users, BarChart3, Globe, CalendarClock, FileText, Link2, FileSpreadsheet, CheckCircle2 } from "lucide-react";
-import { findInstructor } from "../data/mockData";
+import { findInstructor } from "../context/AuthContext";
 import { useAuth } from "../context/AuthContext";
-import RatingStars from "../components/RatingStars";
-import SyllabusPath from "../components/SyllabusPath";
-import ProgressBar from "../components/ProgressBar";
 import RatingModal from "../components/RatingModal";
+import { Star } from "lucide-react";
+import { Check, PlayCircle, FileCheck2 } from "lucide-react";
+
 
 const resourceIcon = { pdf: FileText, link: Link2, csv: FileSpreadsheet };
 
@@ -21,8 +21,8 @@ export default function CourseDetail() {
     return (
       <div className="mx-auto max-w-xl px-5 py-24 text-center">
         <h1 className="font-display text-2xl font-medium text-ink">Course not found</h1>
-        <p className="mt-2 text-sm text-ink-faint">It may have been unpublished. Try browsing the catalog instead.</p>
-        <Link to="/courses" className="mt-5 inline-block rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white">
+        <p className="mt-2 text-sm text-ink-soft">It may have been unpublished. Try browsing the catalog instead.</p>
+        <Link to="/courses" className="mt-5 inline-block rounded bg-brand-500 px-4 py-2 text-sm font-medium text-white">
           Back to courses
         </Link>
       </div>
@@ -35,7 +35,7 @@ export default function CourseDetail() {
 
   const handleEnrol = () => {
     if (!user) {
-      navigate("/login", { state: { from: `/courses/${course.slug}` } });
+      navigate("/login", { state: { from: `/courses/${course.slug}`, enforceRole: "learner" } });
       return;
     }
     enrol(course.id);
@@ -49,16 +49,17 @@ export default function CourseDetail() {
   return (
     <div>
       {/* Header */}
-      <section className="border-b border-ink/10" style={{ background: `linear-gradient(160deg, ${course.heroColor} 0%, #171A21 120%)` }}>
-        <div className="mx-auto max-w-7xl px-5 py-14 text-white lg:px-8">
+      <section className="relative border-b border-border-subtle" style={{ background: `linear-gradient(160deg, ${course.heroColor} 0%, #171A21 120%)` }}>
+        <div className="absolute inset-0 bg-brand-900/60" />
+        <div className="relative mx-auto max-w-7xl px-5 py-14 text-white lg:px-8">
           <div className="flex flex-wrap items-center gap-2 text-xs text-white/70">
             <Link to="/courses" className="hover:text-white">Courses</Link>
             <span>/</span>
             <span>{course.category}</span>
           </div>
           <h1 className="mt-3 max-w-2xl font-display text-3xl font-medium leading-tight sm:text-4xl">{course.title}</h1>
-          <p className="mt-3 max-w-xl text-white/85">{course.tagline}</p>
-          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
+          <p className="mt-3 max-w-xl text-white/90">{course.tagline}</p>
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/90">
             <RatingStars value={course.rating} count={course.ratingCount} />
             <span className="inline-flex items-center gap-1"><Users size={14} /> {course.learners.toLocaleString()} learners</span>
             <span className="inline-flex items-center gap-1"><Clock size={14} /> {course.duration}</span>
@@ -76,7 +77,7 @@ export default function CourseDetail() {
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
               {course.outcomes.map((o) => (
                 <li key={o} className="flex items-start gap-2.5 text-sm text-ink-soft">
-                  <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-moss-500" /> {o}
+                  <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-success" /> {o}
                 </li>
               ))}
             </ul>
@@ -85,10 +86,10 @@ export default function CourseDetail() {
           <section className="mt-10">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-xl font-medium text-ink">Course syllabus</h2>
-              <span className="font-mono text-xs text-ink-faint">{course.lessonsCount} lessons · {course.duration}</span>
+              <span className="font-mono text-xs text-ink-soft">{course.lessonsCount} lessons · {course.duration}</span>
             </div>
             {progress.isEnrolled && <div className="mb-5"><ProgressBar percent={progress.percent} tone="moss" label="Your progress" /></div>}
-            <div className="rounded-xl border border-ink/10 bg-canvas-raised p-5">
+            <div className="rounded-md border border-border-subtle bg-surface p-5">
               <SyllabusPath
                 lessons={course.lessons}
                 completedLessonIds={progress.completedLessonIds}
@@ -114,8 +115,8 @@ export default function CourseDetail() {
                 {course.resources.map((r) => {
                   const Icon = resourceIcon[r.type] || FileText;
                   return (
-                    <div key={r.title} className="flex items-center gap-2.5 rounded-lg border border-ink/10 bg-canvas-raised px-3.5 py-2.5 text-sm text-ink-soft">
-                      <Icon size={15} className="text-indigo-500" /> {r.title}
+                    <div key={r.title} className="flex items-center gap-2.5 rounded border border-border-subtle bg-surface px-3.5 py-2.5 text-sm text-ink-soft">
+                      <Icon size={15} className="text-brand-500" /> {r.title}
                     </div>
                   );
                 })}
@@ -123,11 +124,11 @@ export default function CourseDetail() {
             </section>
           )}
 
-          <section className="mt-10 border-t border-ink/10 pt-8">
+          <section className="mt-10 border-t border-border-subtle pt-8">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-xl font-medium text-ink">Learner feedback</h2>
               {progress.percent === 100 && (
-                <button onClick={() => setReviewOpen((o) => !o)} className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                <button onClick={() => setReviewOpen((o) => !o)} className="text-sm font-medium text-brand-500 hover:text-brand-900">
                   {reviewOpen ? "Cancel" : "Rate this course"}
                 </button>
               )}
@@ -140,14 +141,14 @@ export default function CourseDetail() {
             )}
 
             {reviews.length === 0 ? (
-              <p className="text-sm text-ink-faint">No reviews yet — be the first to finish and leave one.</p>
+              <p className="text-sm text-ink-soft">No reviews yet — be the first to finish and leave one.</p>
             ) : (
               <div className="space-y-5">
                 {reviews.map((r) => (
-                  <div key={r.id} className="border-b border-ink/10 pb-5 last:border-0">
+                  <div key={r.id} className="border-b border-border-subtle pb-5 last:border-0">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium text-ink">{r.learnerName}</p>
-                      <span className="font-mono text-xs text-ink-faint">{r.date}</span>
+                      <span className="font-mono text-xs text-ink-soft">{r.date}</span>
                     </div>
                     <RatingStars value={r.rating} showValue={false} />
                     <p className="mt-1.5 text-sm text-ink-soft">{r.comment}</p>
@@ -160,40 +161,48 @@ export default function CourseDetail() {
 
         {/* Sticky enrol card */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-xl border border-ink/10 bg-canvas-raised p-6 shadow-card">
+          <div className="rounded-md border border-border-subtle bg-surface p-6 shadow-card">
             {progress.isEnrolled ? (
               <>
-                <p className="text-sm font-medium text-moss-600">You're enrolled</p>
+                <p className="text-sm font-medium text-success">You're enrolled</p>
                 <div className="mt-3"><ProgressBar percent={progress.percent} tone="moss" label={`${progress.completed} of ${course.lessonsCount} lessons`} /></div>
                 <Link
                   to={`/learn/${course.slug}`}
-                  className="mt-5 block w-full rounded-lg bg-indigo-600 py-2.5 text-center text-sm font-medium text-white hover:bg-indigo-700"
+                  className="mt-5 block w-full rounded bg-brand-500 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-900"
                 >
                   {progress.percent === 0 ? "Start course" : progress.percent === 100 ? "Review course" : "Continue learning"}
                 </Link>
               </>
+            ) : user?.role === "instructor" || user?.role === "admin" ? (
+              <>
+                <p className="font-display text-2xl font-semibold text-ink">Free</p>
+                <p className="text-xs text-ink-soft">Full access, no time limit</p>
+                <div className="mt-5 block w-full rounded bg-canvas py-2.5 text-center text-sm font-medium text-ink-soft">
+                  Preview mode ({user.role})
+                </div>
+              </>
             ) : (
               <>
                 <p className="font-display text-2xl font-semibold text-ink">Free</p>
-                <p className="text-xs text-ink-faint">Full access, no time limit</p>
+                <p className="text-xs text-ink-soft">Full access, no time limit</p>
                 <button
                   onClick={handleEnrol}
-                  className="mt-5 block w-full rounded-lg bg-indigo-600 py-2.5 text-center text-sm font-medium text-white hover:bg-indigo-700"
+                  className="mt-5 block w-full rounded bg-brand-500 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-900"
                 >
-                  Enrol in one click
+                  Enrol Now
                 </button>
               </>
             )}
 
-            <div className="mt-5 space-y-2.5 border-t border-ink/10 pt-5 text-sm text-ink-soft">
-              <p className="flex items-center gap-2"><Clock size={14} className="text-ink-faint" /> {course.duration} total</p>
-              <p className="flex items-center gap-2"><CalendarClock size={14} className="text-ink-faint" /> Updated {course.updated}</p>
-              <p className="flex items-center gap-2"><BarChart3 size={14} className="text-ink-faint" /> {course.level} level</p>
+            <div className="mt-5 space-y-2.5 border-t border-border-subtle pt-5 text-sm text-ink-soft">
+              <p className="flex items-center gap-2"><Clock size={14} className="text-ink-soft" /> {course.duration} total</p>
+              <p className="flex items-center gap-2"><CalendarClock size={14} className="text-ink-soft" /> Updated {course.updated}</p>
+              <p className="flex items-center gap-2"><BarChart3 size={14} className="text-ink-soft" /> {course.level} level</p>
             </div>
 
             {instructor && (
-              <div className="mt-5 border-t border-ink/10 pt-5">
-                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-faint">Instructor</p>
+              <div className="mt-5 border-t border-border-subtle pt-5">
+                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-soft">Instructor</p>
                 <div className="flex items-start gap-3">
                   <span
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
@@ -203,7 +212,7 @@ export default function CourseDetail() {
                   </span>
                   <div>
                     <p className="text-sm font-medium text-ink">{instructor.name}</p>
-                    <p className="text-xs text-ink-faint">{instructor.title}</p>
+                    <p className="text-xs text-ink-soft">{instructor.title}</p>
                   </div>
                 </div>
                 <p className="mt-3 text-xs text-ink-soft">{instructor.bio}</p>
@@ -213,5 +222,121 @@ export default function CourseDetail() {
         </aside>
       </div>
     </div>
+  );
+}
+
+
+// --- INJECTED ProgressBar ---
+function ProgressBar({ percent = 0, tone = "brand", label }) {
+  const fillClass = tone === "success" ? "bg-success" : "bg-brand-500";
+  return (
+    <div className="w-full">
+      {label && (
+        <div className="mb-1.5 flex items-center justify-between">
+          <span className="text-xs text-ink-soft">{label}</span>
+          <span className="font-mono text-xs text-ink-soft">{percent}%</span>
+        </div>
+      )}
+      <div
+        className="h-1.5 w-full overflow-hidden rounded-sm bg-border-subtle"
+        role="progressbar"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div className={`h-full rounded-sm ${fillClass} transition-all duration-500`} style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
+
+// --- INJECTED HELPER ---
+function RatingStars({ value = 0, size = 14, showValue = true, count }) {
+  const full = Math.round(value);
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className="inline-flex items-center">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star
+            key={i}
+            size={size}
+            className={i < full ? "fill-brand-500 text-brand-500" : "fill-transparent opacity-30"}
+            strokeWidth={1.5}
+          />
+        ))}
+      </span>
+      {showValue && value > 0 && (
+        <span className="font-mono text-xs opacity-90">
+          {value.toFixed(1)}
+          {count != null && <span className="opacity-60"> ({count.toLocaleString()})</span>}
+        </span>
+      )}
+    </span>
+  );
+}
+
+
+// --- INJECTED SyllabusPath ---
+
+/**
+ * Renders an ordered list of lessons as a threaded "syllabus path":
+ * a vertical dashed line connecting node markers per lesson. This is the
+ * platform's signature structural device — legitimate here because course
+ * content genuinely is sequential (lessons run in a fixed order).
+ */
+function SyllabusPath({ lessons, completedLessonIds = [], currentLessonId, onSelect, interactive = false }) {
+  const firstIncompleteId = lessons.find((l) => !completedLessonIds.includes(l.id))?.id;
+
+  return (
+    <ol>
+      {lessons.map((lesson) => {
+        const done = completedLessonIds.includes(lesson.id);
+        const isCurrent = currentLessonId ? currentLessonId === lesson.id : lesson.id === firstIncompleteId;
+        const state = done ? "done" : isCurrent ? "current" : "todo";
+
+        return (
+          <li key={lesson.id} className="path-line pb-6 pl-9 relative last:pb-0">
+            <span
+              className={`absolute left-0 top-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 node-${state}`}
+              aria-hidden="true"
+            >
+              {done ? (
+                <Check size={13} className="text-white" strokeWidth={3} />
+              ) : lesson.type === "assessment" ? (
+                <FileCheck2 size={12} className={isCurrent ? "text-white" : "text-ink-soft"} />
+              ) : (
+                <PlayCircle size={12} className={isCurrent ? "text-white" : "text-ink-soft"} />
+              )}
+            </span>
+
+            {interactive ? (
+              <button
+                type="button"
+                onClick={() => onSelect?.(lesson)}
+                className="group flex w-full items-start justify-between gap-3 rounded -mt-0.5 px-2 py-1 text-left transition hover:bg-canvas"
+              >
+                <span>
+                  <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-soft">
+                    {lesson.type === "assessment" ? "Assessment" : `Lesson ${lesson.order}`}
+                  </span>
+                  <span className={`block text-sm font-medium ${isCurrent ? "text-brand-500" : "text-ink"}`}>
+                    {lesson.title}
+                  </span>
+                </span>
+                <span className="mt-3.5 shrink-0 font-mono text-xs text-ink-soft">{lesson.duration}</span>
+              </button>
+            ) : (
+              <div className="-mt-0.5 px-2 py-1">
+                <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-soft">
+                  {lesson.type === "assessment" ? "Assessment" : `Lesson ${lesson.order}`}
+                </span>
+                <span className="block text-sm font-medium text-ink">{lesson.title}</span>
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }
