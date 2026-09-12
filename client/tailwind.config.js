@@ -23,13 +23,13 @@ export default {
       },
       fontFamily: {
         sans: ["'Inter'", "ui-sans-serif", "system-ui", "sans-serif"],
-        display: ["'Instrument Serif'", "serif"],
-        heading: ["'Manrope'", "sans-serif"],
-        mono: ["'IBM Plex Mono'", "ui-monospace", "monospace"],
+        display: ["'Inter'", "ui-sans-serif", "system-ui", "sans-serif"],
+        heading: ["'Inter'", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["'Inter'", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       boxShadow: {
         card: "0 1px 3px rgba(23, 23, 23, 0.05)",
-        raised: "0 4px 6px -1px rgba(23, 23, 23, 0.05), 0 2px 4px -2px rgba(23, 23, 23, 0.05)",
+        raised: "0 4px 6px -1px rgba(101, 83, 83, 0.05), 0 2px 4px -2px rgba(23, 23, 23, 0.05)",
       },
       borderRadius: {
         sm: "4px",

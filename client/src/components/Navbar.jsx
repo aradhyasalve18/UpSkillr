@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, GraduationCap, ChevronDown } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -12,6 +12,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -63,15 +64,25 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
-          {getLinks().map((link, i) => (
-            <NavLink 
-              key={i} 
-              to={link.to} 
-              className={({ isActive }) => `text-[13px] font-medium tracking-wide ${isActive ? "text-ink" : "text-ink-soft hover:text-ink"}`}
-            >
-              {link.label}
-            </NavLink>
-          ))}
+          {getLinks().map((link, i) => {
+            const currentPath = location.pathname + location.search;
+            const isTabActive = 
+              currentPath === link.to || 
+              (link.to === "/dashboard" && currentPath === "/dashboard") ||
+              (link.to === "/instructor" && currentPath === "/instructor");
+            
+            return (
+              <Link 
+                key={i} 
+                to={link.to} 
+                className={`relative pb-1 text-[13px] font-medium tracking-wide text-ink transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-brand-500 after:transition-all after:duration-300 ${
+                  isTabActive ? "after:w-full" : "after:w-0 hover:after:w-full"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
@@ -126,11 +137,26 @@ export default function Navbar() {
       {open && (
         <div className="border-t border-border-subtle bg-surface px-5 py-4 md:hidden">
           <div className="flex flex-col gap-3">
-            {getLinks().map((link, i) => (
-              <Link key={i} to={link.to} onClick={() => setOpen(false)} className="text-[13px] font-medium text-ink">
-                {link.label}
-              </Link>
-            ))}
+            {getLinks().map((link, i) => {
+              const currentPath = location.pathname + location.search;
+              const isTabActive = 
+                currentPath === link.to || 
+                (link.to === "/dashboard" && currentPath === "/dashboard") ||
+                (link.to === "/instructor" && currentPath === "/instructor");
+                
+              return (
+                <Link 
+                  key={i} 
+                  to={link.to} 
+                  onClick={() => setOpen(false)} 
+                  className={`relative inline-block w-fit pb-1 text-[13px] font-medium text-ink transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-brand-500 after:transition-all after:duration-300 ${
+                    isTabActive ? "after:w-full" : "after:w-0 hover:after:w-full"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
 
             {user ? (
               <>
