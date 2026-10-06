@@ -11,6 +11,7 @@ export default function Learn() {
   const navigate = useNavigate();
   const { allCourses, user, progressFor, toggleLesson, enrol } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [videoError, setVideoError] = useState(false);
 
   const course = allCourses.find((c) => c.slug === slug);
   const progress = progressFor(course?.id, course?.lessonsCount);
@@ -36,6 +37,8 @@ export default function Learn() {
     return firstIncomplete || course.lessons[0];
   }, [course, lessonIdParam, progress.completedLessonIds]);
 
+  useEffect(() => setVideoError(false), [currentLesson?.id]);
+
   if (!course) {
     return (
       <div className="mx-auto max-w-lg px-5 py-24 text-center">
@@ -55,8 +58,12 @@ export default function Learn() {
 
   const handleToggle = () => toggleLesson(course.id, currentLesson.id);
 
-  const handleNext = () => {
+  const handleAssessmentComplete = () => {
     if (!isDone) toggleLesson(course.id, currentLesson.id);
+  };
+
+  const handleNext = () => {
+    if (!isDone && currentLesson.type !== "assessment") toggleLesson(course.id, currentLesson.id);
     if (nextLesson) goTo(nextLesson);
   };
 
@@ -74,7 +81,7 @@ export default function Learn() {
               <ArrowLeft size={13} /> Back to overview
             </Link>
             <h2 className="mt-3 font-display text-base font-medium leading-snug text-ink">{course.title}</h2>
-            <div className="mt-3"><ProgressBar percent={progress.percent} tone="success" label={`${progress.completed} of ${course.lessonsCount} complete`} /></div>
+            <div className="mt-3"><ProgressBar percent={progress.percent} tone="success" label={`${progress.completed} of ${course.lessons?.length ?? course.lessonsCount} complete`} /></div>
             <div className="mt-6">
               <SyllabusPath
                 lessons={course.lessons}
@@ -110,32 +117,55 @@ export default function Learn() {
           {/* Lesson content surface */}
           {currentLesson.type === "assessment" ? (
             <div className="mt-8">
-              <AssessmentQuiz lesson={currentLesson} />
+              <AssessmentQuiz key={currentLesson.id} lesson={currentLesson} onComplete={handleAssessmentComplete} />
             </div>
           ) : (
-            <div className="mt-8 flex aspect-video items-center justify-center rounded-md border border-border-subtle bg-ink text-white">
-              <div className="text-center">
-                <PlayCircle size={44} className="mx-auto mb-3 text-white/80" />
-                <p className="text-sm text-white/70">Lesson video renders here</p>
-              </div>
+            <div className="mt-8 overflow-hidden rounded-md border border-border-subtle bg-ink">
+              {(currentLesson.videoUrl || currentLesson.content?.videoUrl) && !videoError ? (
+                <video
+                  key={currentLesson.id}
+                  controls
+                  preload="metadata"
+                  className="aspect-video w-full"
+                  src={currentLesson.videoUrl || currentLesson.content.videoUrl}
+                  onError={() => setVideoError(true)}
+                >
+                  Your browser does not support video playback.
+                </video>
+              ) : (
+                <div className="flex aspect-video flex-col items-center justify-center px-6 text-center text-white">
+                  <PlayCircle size={44} className="mb-3 text-white/80" />
+                  <p className="text-sm text-white/80">{videoError ? "This lesson video could not be loaded." : "Video not available for this lesson."}</p>
+                  <p className="mt-1 text-xs text-white/60">Use the lesson notes below to follow along.</p>
+                </div>
+              )}
             </div>
           )}
 
           <div className="mt-6 rounded-md border border-border-subtle bg-surface p-5 text-sm leading-relaxed text-ink-soft">
-            {currentLesson.summary ||
+            {typeof currentLesson.content === "string" && currentLesson.content.trim()
+              ? currentLesson.content
+              : currentLesson.summary ||
               "This lesson walks through the concept step by step, with the working example built live so you can follow along and reproduce it yourself."}
           </div>
 
           <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border-subtle pt-6">
-            <button
-              onClick={handleToggle}
-              className={`inline-flex items-center gap-2 rounded px-4 py-2.5 text-sm font-medium transition ${
-                isDone ? "bg-canvas border border-success text-success hover:bg-surface" : "bg-brand-500 text-white hover:bg-brand-900"
-              }`}
-            >
-              {isDone ? <CheckCircle2 size={16} /> : <Circle size={16} />}
-              {isDone ? "Marked complete" : "Mark as complete"}
-            </button>
+            {currentLesson.type === "assessment" ? (
+              <p className={`inline-flex items-center gap-2 text-sm font-medium ${isDone ? "text-success" : "text-ink-soft"}`} aria-live="polite">
+                {isDone ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                {isDone ? "Assessment complete" : "Submit the assessment to complete this lesson"}
+              </p>
+            ) : (
+              <button
+                onClick={handleToggle}
+                className={`inline-flex items-center gap-2 rounded px-4 py-2.5 text-sm font-medium transition ${
+                  isDone ? "bg-canvas border border-success text-success hover:bg-surface" : "bg-brand-500 text-white hover:bg-brand-900"
+                }`}
+              >
+                {isDone ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                {isDone ? "Marked complete" : "Mark as complete"}
+              </button>
+            )}
 
             <div className="flex items-center gap-2">
               <button
@@ -155,7 +185,7 @@ export default function Learn() {
               ) : (
                 <Link
                   to={`/courses/${course.slug}`}
-                  onClick={() => !isDone && toggleLesson(course.id, currentLesson.id)}
+                  onClick={() => !isDone && currentLesson.type !== "assessment" && toggleLesson(course.id, currentLesson.id)}
                   className="inline-flex items-center gap-1.5 rounded bg-success px-3.5 py-2.5 text-sm font-medium text-white hover:bg-success"
                 >
                   Finish course <CheckCircle2 size={14} />

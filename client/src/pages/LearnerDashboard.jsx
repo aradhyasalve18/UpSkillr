@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { BookOpen, ArrowRight, CheckCircle2, Clock, BarChart3 } from "lucide-react";
+import { BookOpen, ArrowRight, CheckCircle2, Clock, Trophy } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import CourseCard from "../components/CourseCard";
 import { findInstructor } from "../context/AuthContext";
@@ -56,10 +56,20 @@ export default function LearnerDashboard() {
 
       {completed.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-4 font-display text-xl font-medium text-ink">Completed</h2>
+          <div className="mb-4 flex items-center gap-2">
+            <h2 className="font-display text-xl font-medium text-ink">Completed</h2>
+            <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2.5 py-1 text-xs font-medium text-success" aria-label={`${completed.length} course completion badges earned`}>
+              <Trophy size={13} /> {completed.length} {completed.length === 1 ? "badge" : "badges"} earned
+            </span>
+          </div>
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {completed.map((c) => (
-              <CourseCard key={c.id} course={c} progress={progressFor(c.id, c.lessonsCount)} />
+              <div key={c.id} className="relative">
+                <span className="pointer-events-none absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-success px-2.5 py-1 text-xs font-medium text-white shadow" title={`${c.title} completed`}>
+                  <CheckCircle2 size={13} /> Completed
+                </span>
+                <CourseCard course={c} progress={progressFor(c.id, c.lessonsCount)} />
+              </div>
             ))}
           </div>
         </section>

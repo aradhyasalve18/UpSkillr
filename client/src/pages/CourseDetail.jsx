@@ -32,6 +32,11 @@ export default function CourseDetail() {
   const instructor = findInstructor(course.instructorId);
   const progress = progressFor(course.id, course.lessonsCount);
   const reviews = allReviews.filter((r) => r.courseId === course.id);
+  const currentLearnerName = user?.name?.trim().toLowerCase();
+  const hasReviewed = Boolean(currentLearnerName && reviews.some(
+    (review) => review.id?.startsWith("ur-") && review.learnerName?.trim().toLowerCase() === currentLearnerName
+  ));
+  const canReview = user?.role === "learner" && progress.percent === 100 && !hasReviewed;
 
   const handleEnrol = () => {
     if (!user) {
@@ -127,7 +132,7 @@ export default function CourseDetail() {
           <section className="mt-10 border-t border-border-subtle pt-8">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-xl font-medium text-ink">Learner feedback</h2>
-              {progress.percent === 100 && (
+              {canReview && (
                 <button onClick={() => setReviewOpen((o) => !o)} className="text-sm font-medium text-brand-500 hover:text-brand-900">
                   {reviewOpen ? "Cancel" : "Rate this course"}
                 </button>
