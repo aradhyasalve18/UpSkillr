@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, GraduationCap, ChevronDown } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+
 
 const initials = (name) =>
   name.split(" ").map((p) => p[0]).slice(0, 2).join("");
@@ -11,6 +12,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -18,41 +20,80 @@ export default function Navbar() {
     navigate("/");
   };
 
-  const dashboardPath = user?.role === "instructor" ? "/instructor" : "/dashboard";
+  const dashboardPath = user?.role === "instructor" ? "/instructor" : user?.role === "admin" ? "/admin" : "/dashboard";
+
+  const getLinks = () => {
+    if (!user) return [{ to: "/courses", label: "Discover" }];
+    if (user.role === "learner") {
+      return [
+        { to: "/courses", label: "Discover" },
+        { to: "/dashboard?tab=learning", label: "My Learning" },
+        { to: "/dashboard?tab=progress", label: "Progress" }
+      ];
+    }
+    if (user.role === "instructor") {
+      return [
+        { to: "/instructor", label: "Dashboard" },
+        { to: "/instructor?tab=courses", label: "My Courses" },
+        { to: "/instructor/new", label: "Create Course" },
+        { to: "/instructor?tab=students", label: "Students" }
+      ];
+    }
+    if (user.role === "admin") {
+      return [
+        { to: "/admin", label: "Admin Dashboard" },
+        { to: "/courses", label: "All Courses" }
+      ];
+    }
+    return [];
+  };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink/10 bg-canvas/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 bg-surface border-b border-border-subtle">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 lg:px-8">
         <Link to="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-600 text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded bg-brand-500 text-white">
             <GraduationCap size={18} />
           </span>
-          <span className="font-display text-lg font-semibold tracking-tight text-ink">UpSkillr</span>
+          <span className="font-display text-xl font-semibold tracking-tight text-ink mt-1">UpSkillr</span>
+          {user?.role === "instructor" && (
+            <span className="ml-2 rounded bg-canvas px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-ink-soft border border-border-subtle">
+              Instructor
+            </span>
+          )}
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex">
-          <NavLink to="/courses" className={({ isActive }) => `text-sm font-medium ${isActive ? "text-indigo-600" : "text-ink-soft hover:text-ink"}`}>
-            Explore courses
-          </NavLink>
-          <NavLink to="/instructor" className={({ isActive }) => `text-sm font-medium ${isActive ? "text-indigo-600" : "text-ink-soft hover:text-ink"}`}>
-            Teach on UpSkillr
-          </NavLink>
-          {user && (
-            <NavLink to={dashboardPath} className={({ isActive }) => `text-sm font-medium ${isActive ? "text-indigo-600" : "text-ink-soft hover:text-ink"}`}>
-              Dashboard
-            </NavLink>
-          )}
+        <nav className="hidden items-center gap-6 md:flex">
+          {getLinks().map((link, i) => {
+            const currentPath = location.pathname + location.search;
+            const isTabActive = 
+              currentPath === link.to || 
+              (link.to === "/dashboard" && currentPath === "/dashboard") ||
+              (link.to === "/instructor" && currentPath === "/instructor");
+            
+            return (
+              <Link 
+                key={i} 
+                to={link.to} 
+                className={`relative pb-1 text-[13px] font-medium tracking-wide text-ink transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-brand-500 after:transition-all after:duration-300 ${
+                  isTabActive ? "after:w-full" : "after:w-0 hover:after:w-full"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-4 md:flex">
           {!user ? (
             <>
-              <Link to="/login" className="text-sm font-medium text-ink-soft hover:text-ink">
+              <Link to="/login" className="text-[13px] font-medium text-ink hover:text-ink-soft">
                 Log in
               </Link>
               <Link
                 to="/register"
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+                className="rounded bg-brand-500 px-4 py-2 text-[13px] font-medium text-white transition hover:bg-brand-900"
               >
                 Get started
               </Link>
@@ -61,28 +102,25 @@ export default function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setMenu((m) => !m)}
-                className="flex items-center gap-2 rounded-lg border border-ink/10 py-1.5 pl-1.5 pr-3 hover:bg-canvas-sunken"
+                className="flex items-center gap-2 rounded border border-transparent py-1 pl-1 pr-2 hover:bg-canvas transition"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded bg-brand-500 text-[11px] font-semibold text-white">
                   {initials(user.name)}
                 </span>
-                <span className="text-sm font-medium text-ink">{user.name.split(" ")[0]}</span>
-                <ChevronDown size={14} className="text-ink-faint" />
+                <span className="text-[13px] font-medium text-ink">{user.name.split(" ")[0]}</span>
+                <ChevronDown size={14} className="text-ink-soft" />
               </button>
               {menu && (
-                <div className="absolute right-0 mt-2 w-56 rounded-xl border border-ink/10 bg-canvas-raised p-1.5 shadow-raised">
+                <div className="absolute right-0 mt-2 w-56 rounded border border-border-subtle bg-surface p-1 shadow-card">
                   <div className="px-3 py-2">
-                    <p className="text-sm font-medium text-ink">{user.name}</p>
-                    <p className="text-xs capitalize text-ink-faint">{user.role} account</p>
+                    <p className="text-[13px] font-medium text-ink">{user.name}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-ink-soft mt-0.5">{user.role} account</p>
                   </div>
-                  <div className="my-1 border-t border-ink/10" />
-                  <Link to={dashboardPath} onClick={() => setMenu(false)} className="block rounded-lg px-3 py-2 text-sm text-ink-soft hover:bg-canvas-sunken hover:text-ink">
-                    Dashboard
+                  <div className="my-1 border-t border-border-subtle" />
+                  <Link to="/profile" onClick={() => setMenu(false)} className="block rounded px-3 py-2 text-[13px] text-ink-soft hover:bg-canvas hover:text-ink">
+                    Profile
                   </Link>
-                  <Link to="/profile" onClick={() => setMenu(false)} className="block rounded-lg px-3 py-2 text-sm text-ink-soft hover:bg-canvas-sunken hover:text-ink">
-                    Profile settings
-                  </Link>
-                  <button onClick={handleLogout} className="block w-full rounded-lg px-3 py-2 text-left text-sm text-clay-500 hover:bg-clay-400/10">
+                  <button onClick={handleLogout} className="block w-full rounded px-3 py-2 text-left text-[13px] text-error hover:bg-canvas">
                     Log out
                   </button>
                 </div>
@@ -91,26 +129,45 @@ export default function Navbar() {
           )}
         </div>
 
-        <button className="p-2 md:hidden" onClick={() => setOpen((o) => !o)} aria-label="Toggle menu">
+        <button className="p-2 md:hidden text-ink" onClick={() => setOpen((o) => !o)} aria-label="Toggle menu">
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
       {open && (
-        <div className="border-t border-ink/10 bg-canvas-raised px-5 py-4 md:hidden">
+        <div className="border-t border-border-subtle bg-surface px-5 py-4 md:hidden">
           <div className="flex flex-col gap-3">
-            <Link to="/courses" onClick={() => setOpen(false)} className="text-sm font-medium text-ink">Explore courses</Link>
-            <Link to="/instructor" onClick={() => setOpen(false)} className="text-sm font-medium text-ink">Teach on UpSkillr</Link>
+            {getLinks().map((link, i) => {
+              const currentPath = location.pathname + location.search;
+              const isTabActive = 
+                currentPath === link.to || 
+                (link.to === "/dashboard" && currentPath === "/dashboard") ||
+                (link.to === "/instructor" && currentPath === "/instructor");
+                
+              return (
+                <Link 
+                  key={i} 
+                  to={link.to} 
+                  onClick={() => setOpen(false)} 
+                  className={`relative inline-block w-fit pb-1 text-[13px] font-medium text-ink transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-brand-500 after:transition-all after:duration-300 ${
+                    isTabActive ? "after:w-full" : "after:w-0 hover:after:w-full"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+
             {user ? (
               <>
-                <Link to={dashboardPath} onClick={() => setOpen(false)} className="text-sm font-medium text-ink">Dashboard</Link>
-                <Link to="/profile" onClick={() => setOpen(false)} className="text-sm font-medium text-ink">Profile settings</Link>
-                <button onClick={handleLogout} className="text-left text-sm font-medium text-clay-500">Log out</button>
+                <Link to="/profile" onClick={() => setOpen(false)} className="text-[13px] font-medium text-ink">Profile</Link>
+                <button onClick={handleLogout} className="text-left text-[13px] font-medium text-error mt-2">Log out</button>
               </>
             ) : (
               <>
-                <Link to="/login" onClick={() => setOpen(false)} className="text-sm font-medium text-ink">Log in</Link>
-                <Link to="/register" onClick={() => setOpen(false)} className="text-sm font-medium text-indigo-600">Get started</Link>
+                <div className="my-2 border-t border-border-subtle" />
+                <Link to="/login" onClick={() => setOpen(false)} className="text-[13px] font-medium text-ink">Log in</Link>
+                <Link to="/register" onClick={() => setOpen(false)} className="text-[13px] font-medium text-brand-500">Get started</Link>
               </>
             )}
           </div>

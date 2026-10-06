@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, CheckCircle2, Circle, PlayCircle, PanelLeftClose, PanelLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, PlayCircle, PanelLeftClose, PanelLeft, Check, FileCheck2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import SyllabusPath from "../components/SyllabusPath";
-import ProgressBar from "../components/ProgressBar";
 import AssessmentQuiz from "../components/AssessmentQuiz";
+
 
 export default function Learn() {
   const { slug } = useParams();
@@ -12,6 +11,7 @@ export default function Learn() {
   const navigate = useNavigate();
   const { allCourses, user, progressFor, toggleLesson, enrol } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [videoError, setVideoError] = useState(false);
 
   const course = allCourses.find((c) => c.slug === slug);
   const progress = progressFor(course?.id, course?.lessonsCount);
@@ -37,11 +37,13 @@ export default function Learn() {
     return firstIncomplete || course.lessons[0];
   }, [course, lessonIdParam, progress.completedLessonIds]);
 
+  useEffect(() => setVideoError(false), [currentLesson?.id]);
+
   if (!course) {
     return (
       <div className="mx-auto max-w-lg px-5 py-24 text-center">
         <h1 className="font-display text-2xl font-medium text-ink">Course not found</h1>
-        <Link to="/courses" className="mt-4 inline-block text-sm font-medium text-indigo-600">Back to catalog</Link>
+        <Link to="/courses" className="mt-4 inline-block text-sm font-medium text-brand-500">Back to catalog</Link>
       </div>
     );
   }
@@ -56,8 +58,12 @@ export default function Learn() {
 
   const handleToggle = () => toggleLesson(course.id, currentLesson.id);
 
-  const handleNext = () => {
+  const handleAssessmentComplete = () => {
     if (!isDone) toggleLesson(course.id, currentLesson.id);
+  };
+
+  const handleNext = () => {
+    if (!isDone && currentLesson.type !== "assessment") toggleLesson(course.id, currentLesson.id);
     if (nextLesson) goTo(nextLesson);
   };
 
@@ -65,17 +71,17 @@ export default function Learn() {
     <div className="flex min-h-[calc(100vh-4rem)]">
       {/* Sidebar */}
       <aside
-        className={`shrink-0 overflow-y-auto border-r border-ink/10 bg-canvas-raised transition-all ${
+        className={`shrink-0 overflow-y-auto border-r border-border-subtle bg-surface transition-all ${
           sidebarOpen ? "w-80 p-5" : "w-0 p-0"
         }`}
       >
         {sidebarOpen && (
           <>
-            <Link to={`/courses/${course.slug}`} className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-faint hover:text-ink">
+            <Link to={`/courses/${course.slug}`} className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-soft hover:text-ink">
               <ArrowLeft size={13} /> Back to overview
             </Link>
             <h2 className="mt-3 font-display text-base font-medium leading-snug text-ink">{course.title}</h2>
-            <div className="mt-3"><ProgressBar percent={progress.percent} tone="moss" label={`${progress.completed} of ${course.lessonsCount} complete`} /></div>
+            <div className="mt-3"><ProgressBar percent={progress.percent} tone="success" label={`${progress.completed} of ${course.lessons?.length ?? course.lessonsCount} complete`} /></div>
             <div className="mt-6">
               <SyllabusPath
                 lessons={course.lessons}
@@ -95,69 +101,92 @@ export default function Learn() {
           <div className="mb-6 flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen((s) => !s)}
-              className="rounded-lg border border-ink/10 p-2 text-ink-faint hover:bg-canvas-sunken"
+              className="rounded border border-border-subtle p-2 text-ink-soft hover:bg-canvas"
               aria-label="Toggle syllabus"
             >
               {sidebarOpen ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
             </button>
-            <span className="font-mono text-xs uppercase tracking-wide text-ink-faint">
+            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">
               {currentLesson.type === "assessment" ? "Assessment" : `Lesson ${currentLesson.order} of ${course.lessonsCount}`}
             </span>
           </div>
 
           <h1 className="font-display text-2xl font-medium text-ink sm:text-3xl">{currentLesson.title}</h1>
-          <p className="mt-2 text-sm text-ink-faint">{currentLesson.duration}</p>
+          <p className="mt-2 text-sm text-ink-soft">{currentLesson.duration}</p>
 
           {/* Lesson content surface */}
           {currentLesson.type === "assessment" ? (
             <div className="mt-8">
-              <AssessmentQuiz lesson={currentLesson} />
+              <AssessmentQuiz key={currentLesson.id} lesson={currentLesson} onComplete={handleAssessmentComplete} />
             </div>
           ) : (
-            <div className="mt-8 flex aspect-video items-center justify-center rounded-xl border border-ink/10 bg-ink text-white">
-              <div className="text-center">
-                <PlayCircle size={44} className="mx-auto mb-3 text-white/80" />
-                <p className="text-sm text-white/70">Lesson video renders here</p>
-              </div>
+            <div className="mt-8 overflow-hidden rounded-md border border-border-subtle bg-ink">
+              {(currentLesson.videoUrl || currentLesson.content?.videoUrl) && !videoError ? (
+                <video
+                  key={currentLesson.id}
+                  controls
+                  preload="metadata"
+                  className="aspect-video w-full"
+                  src={currentLesson.videoUrl || currentLesson.content.videoUrl}
+                  onError={() => setVideoError(true)}
+                >
+                  Your browser does not support video playback.
+                </video>
+              ) : (
+                <div className="flex aspect-video flex-col items-center justify-center px-6 text-center text-white">
+                  <PlayCircle size={44} className="mb-3 text-white/80" />
+                  <p className="text-sm text-white/80">{videoError ? "This lesson video could not be loaded." : "Video not available for this lesson."}</p>
+                  <p className="mt-1 text-xs text-white/60">Use the lesson notes below to follow along.</p>
+                </div>
+              )}
             </div>
           )}
 
-          <div className="mt-6 rounded-xl border border-ink/10 bg-canvas-raised p-5 text-sm leading-relaxed text-ink-soft">
-            {currentLesson.summary ||
+          <div className="mt-6 rounded-md border border-border-subtle bg-surface p-5 text-sm leading-relaxed text-ink-soft">
+            {typeof currentLesson.content === "string" && currentLesson.content.trim()
+              ? currentLesson.content
+              : currentLesson.summary ||
               "This lesson walks through the concept step by step, with the working example built live so you can follow along and reproduce it yourself."}
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-ink/10 pt-6">
-            <button
-              onClick={handleToggle}
-              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition ${
-                isDone ? "bg-moss-50 text-moss-600 hover:bg-moss-100" : "bg-indigo-600 text-white hover:bg-indigo-700"
-              }`}
-            >
-              {isDone ? <CheckCircle2 size={16} /> : <Circle size={16} />}
-              {isDone ? "Marked complete" : "Mark as complete"}
-            </button>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border-subtle pt-6">
+            {currentLesson.type === "assessment" ? (
+              <p className={`inline-flex items-center gap-2 text-sm font-medium ${isDone ? "text-success" : "text-ink-soft"}`} aria-live="polite">
+                {isDone ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                {isDone ? "Assessment complete" : "Submit the assessment to complete this lesson"}
+              </p>
+            ) : (
+              <button
+                onClick={handleToggle}
+                className={`inline-flex items-center gap-2 rounded px-4 py-2.5 text-sm font-medium transition ${
+                  isDone ? "bg-canvas border border-success text-success hover:bg-surface" : "bg-brand-500 text-white hover:bg-brand-900"
+                }`}
+              >
+                {isDone ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                {isDone ? "Marked complete" : "Mark as complete"}
+              </button>
+            )}
 
             <div className="flex items-center gap-2">
               <button
                 disabled={!prevLesson}
                 onClick={() => prevLesson && goTo(prevLesson)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-ink/15 px-3.5 py-2.5 text-sm font-medium text-ink disabled:opacity-30"
+                className="inline-flex items-center gap-1.5 rounded border border-border-subtle px-3.5 py-2.5 text-sm font-medium text-ink disabled:opacity-30"
               >
                 <ArrowLeft size={14} /> Previous
               </button>
               {nextLesson ? (
                 <button
                   onClick={handleNext}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+                  className="inline-flex items-center gap-1.5 rounded bg-brand-500 px-3.5 py-2.5 text-sm font-medium text-white hover:bg-brand-900"
                 >
                   Next lesson <ArrowRight size={14} />
                 </button>
               ) : (
                 <Link
                   to={`/courses/${course.slug}`}
-                  onClick={() => !isDone && toggleLesson(course.id, currentLesson.id)}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-moss-500 px-3.5 py-2.5 text-sm font-medium text-white hover:bg-moss-600"
+                  onClick={() => !isDone && currentLesson.type !== "assessment" && toggleLesson(course.id, currentLesson.id)}
+                  className="inline-flex items-center gap-1.5 rounded bg-success px-3.5 py-2.5 text-sm font-medium text-white hover:bg-success"
                 >
                   Finish course <CheckCircle2 size={14} />
                 </Link>
@@ -167,5 +196,95 @@ export default function Learn() {
         </div>
       </div>
     </div>
+  );
+}
+
+
+// --- INJECTED ProgressBar ---
+function ProgressBar({ percent = 0, tone = "brand", label }) {
+  const fillClass = tone === "success" ? "bg-success" : "bg-brand-500";
+  return (
+    <div className="w-full">
+      {label && (
+        <div className="mb-1.5 flex items-center justify-between">
+          <span className="text-xs text-ink-soft">{label}</span>
+          <span className="font-mono text-xs text-ink-soft">{percent}%</span>
+        </div>
+      )}
+      <div
+        className="h-1.5 w-full overflow-hidden rounded-sm bg-border-subtle"
+        role="progressbar"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div className={`h-full rounded-sm ${fillClass} transition-all duration-500`} style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
+
+// --- INJECTED SyllabusPath ---
+
+/**
+ * Renders an ordered list of lessons as a threaded "syllabus path":
+ * a vertical dashed line connecting node markers per lesson. This is the
+ * platform's signature structural device — legitimate here because course
+ * content genuinely is sequential (lessons run in a fixed order).
+ */
+function SyllabusPath({ lessons, completedLessonIds = [], currentLessonId, onSelect, interactive = false }) {
+  const firstIncompleteId = lessons.find((l) => !completedLessonIds.includes(l.id))?.id;
+
+  return (
+    <ol>
+      {lessons.map((lesson) => {
+        const done = completedLessonIds.includes(lesson.id);
+        const isCurrent = currentLessonId ? currentLessonId === lesson.id : lesson.id === firstIncompleteId;
+        const state = done ? "done" : isCurrent ? "current" : "todo";
+
+        return (
+          <li key={lesson.id} className="path-line pb-6 pl-9 relative last:pb-0">
+            <span
+              className={`absolute left-0 top-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 node-${state}`}
+              aria-hidden="true"
+            >
+              {done ? (
+                <Check size={13} className="text-white" strokeWidth={3} />
+              ) : lesson.type === "assessment" ? (
+                <FileCheck2 size={12} className={isCurrent ? "text-white" : "text-ink-soft"} />
+              ) : (
+                <PlayCircle size={12} className={isCurrent ? "text-white" : "text-ink-soft"} />
+              )}
+            </span>
+
+            {interactive ? (
+              <button
+                type="button"
+                onClick={() => onSelect?.(lesson)}
+                className="group flex w-full items-start justify-between gap-3 rounded -mt-0.5 px-2 py-1 text-left transition hover:bg-canvas"
+              >
+                <span>
+                  <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-soft">
+                    {lesson.type === "assessment" ? "Assessment" : `Lesson ${lesson.order}`}
+                  </span>
+                  <span className={`block text-sm font-medium ${isCurrent ? "text-brand-500" : "text-ink"}`}>
+                    {lesson.title}
+                  </span>
+                </span>
+                <span className="mt-3.5 shrink-0 font-mono text-xs text-ink-soft">{lesson.duration}</span>
+              </button>
+            ) : (
+              <div className="-mt-0.5 px-2 py-1">
+                <span className="block text-[11px] font-mono uppercase tracking-wide text-ink-soft">
+                  {lesson.type === "assessment" ? "Assessment" : `Lesson ${lesson.order}`}
+                </span>
+                <span className="block text-sm font-medium text-ink">{lesson.title}</span>
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }
